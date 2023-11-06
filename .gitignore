@@ -1,0 +1,10 @@
+# Virtual environment
+venv/
+bin/
+lib/
+include/
+.idea/
+*.iml
+.DS_Store
+__pycache__/
+*.pyc

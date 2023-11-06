@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unsupervised Customer Segmentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        section#project-info, section#example-file, section#file-upload {
+            margin: 20px;
+            padding: 20px;
+            background: #fff;
+        }
+        #uploadProgress > div {
+            background-color: #4caf50; /* Green */
+            height: 24px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        #progressDiv {
+            display: none;
+            width: 100%;
+        }
+        #uploadProgress {
+            background-color: #ddd;
+            width: 100%;
+            margin-top: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 20px;
+            background: #333;
+            color: #fff;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Unsupervised Customer Segmentation</h1>
+    </header>
+
+    <section id="project-info">
+        <h2>Project Goal</h2>
+        <p>This project aims to segment customers into meaningful groups using unsupervised learning techniques.</p>
+    </section>
+
+    <section id="example-file">
+        <h2>Example File</h2>
+        <p><a href="/data/data.csv" download>Click here to download the example data.csv.</a></p>
+    </section>
+
+    <section id="file-upload">
+        <h2>Upload Your File</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Upload & Predict</button>
+        </form>
+        <div id="progressDiv">
+            <div id="uploadProgress">
+                <div></div>
+            </div>
+        </div>
+        <div id="result"></div>
+    </section>
+
+    <footer>
+        © 2023 Unsupervised Customer Segmentation
+    </footer>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const xhr = new XMLHttpRequest();
+            const progressBar = document.getElementById('uploadProgress').children[0];
+            const progressDiv = document.getElementById('progressDiv');
+            const resultDiv = document.getElementById('result');
+
+            // Show progress bar
+            progressDiv.style.display = 'block';
+
+            // Update progress bar during upload
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    const percentage = Math.round((event.loaded / event.total) * 100);
+                    progressBar.style.width = percentage + '%';
+                }
+            };
+
+            // Set up response type for blob
+            xhr.responseType = 'blob';
+
+            // Handle the response from the server
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // Hide progress bar
+                    progressDiv.style.display = 'none';
+
+                    // Download the blob as a file
+                    const blob = xhr.response;
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'predictions.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    resultDiv.textContent = 'File download started!';
+                } else {
+                    resultDiv.textContent = 'An error occurred during the file upload.';
+                }
+            };
+
+            // Handle errors
+            xhr.onerror = function() {
+                progressDiv.style.display = 'none';
+                resultDiv.textContent = 'An error occurred during the file upload.';
+            };
+
+            // Open the request and send the file
+            xhr.open('POST', '/predict/', true);
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>
