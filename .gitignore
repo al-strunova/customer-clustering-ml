@@ -4,6 +4,7 @@ bin/
 lib/
 include/
 .idea/
+.idea_backup/
 *.iml
 .DS_Store
 __pycache__/
